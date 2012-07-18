@@ -1,0 +1,22 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    i18n_domain="collective.assets">
+
+  <browser:page
+      for="*"
+      name="resourceregistries_scripts_view"
+      class=".browser.ScriptsView"
+      permission="zope.Public"
+      allowed_attributes="scripts"
+      />
+
+  <browser:page
+      for="*"
+      name="resourceregistries_styles_view"
+      class=".browser.StylesView"
+      permission="zope.Public"
+      allowed_attributes="styles"
+      />
+
+</configure>

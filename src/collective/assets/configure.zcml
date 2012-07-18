@@ -1,0 +1,23 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:five="http://namespaces.zope.org/five"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
+    i18n_domain="collective.assets">
+
+  <five:registerPackage package="." initialize=".initialize" />
+
+  <!-- -*- extra stuff goes here -*- -->
+  <browser:page
+      name="generate-assets"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      class=".browser.GenerateAssetsView"
+      permission="cmf.ManagePortal"
+      />
+  
+  <utility
+      factory=".env.get_webassets_environment"
+      provides=".env.IWebAssetsEnvironment"
+      />
+
+</configure>
