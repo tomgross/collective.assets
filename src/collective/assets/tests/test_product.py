@@ -6,7 +6,7 @@ from collective.assets.testing import\
     COLLECTIVE_ASSETS_INTEGRATION_TESTING
 
 
-class TestExample(unittest.TestCase):
+class TestProduct(unittest.TestCase):
 
     layer = COLLECTIVE_ASSETS_INTEGRATION_TESTING
     

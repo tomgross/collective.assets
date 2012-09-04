@@ -11,6 +11,12 @@ class CollectiveAssets(PloneSandboxLayer):
     defaultBases = (PLONE_FIXTURE, )
 
     def setUpZope(self, app, configurationContext):
+        # Load ZCML for dependend packages
+        import plone.resource
+        xmlconfig.file('configure.zcml',
+                       plone.resource,
+                       context=configurationContext)
+
         # Load ZCML for this package
         import collective.assets
         xmlconfig.file('configure.zcml',

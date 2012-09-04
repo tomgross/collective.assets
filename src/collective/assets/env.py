@@ -13,6 +13,9 @@ class IWebAssetsEnvironment(Interface):
 def get_webassets_environment():
     # get global resource path from plone.resource configuration
     plone_resource = zope.component.queryUtility(IResourceDirectory, name=u'')
+    if plone_resource is None:
+        # if starting up and in unittest scenarios
+        return
 
     resource_path = join(plone_resource.directory, 'theme', 'rr')
 
