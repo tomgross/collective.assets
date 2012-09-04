@@ -2,6 +2,7 @@ from os.path import join, exists, dirname
 from os import makedirs
 import datetime
 import operator
+import logging
 from Acquisition import aq_inner
 from AccessControl import getSecurityManager
 
@@ -13,6 +14,8 @@ import zope.component
 from webassets import Bundle, Environment
 from jsmin import jsmin
 from .env import IWebAssetsEnvironment
+
+LOG = logging.getLogger('assets')
 
 try:
     from Products.ResourceRegistries.browser.scripts import ScriptsView as BaseScriptsView
@@ -124,7 +127,6 @@ class GenerateAssetsView(BrowserView):
             #saved_debug_mode = tool.getDebugMode()
             tool.setDebugMode(False)
             resources = tool.getResourcesDict()
-            print
             for i, entry in enumerate(tool.getCookedResources(theme)):
 
                 # get groups of resources
@@ -136,7 +138,7 @@ class GenerateAssetsView(BrowserView):
 
                 # get individual resources of a group
                 for eid in subentries:
-                    print "  - ", eid
+                    LOG.debug('merging %s', eid)
                     file_resource = join(env.directory, info.suffix, eid)
                     if not exists(dirname(file_resource)):
                         makedirs(dirname(file_resource))
