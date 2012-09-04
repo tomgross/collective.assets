@@ -14,6 +14,7 @@ import zope.component
 from webassets import Bundle, Environment
 from jsmin import jsmin
 from .env import IWebAssetsEnvironment
+from .interfaces import IAssetsConfig
 
 LOG = logging.getLogger('assets')
 
@@ -41,12 +42,11 @@ def check(bundle, context):
     portal_css = getToolByName(context, 'portal_css')
     return portal_css.evaluateExpression(exp, context)
 
-TURNED_ON = False
-
 class ScriptsView(BaseScriptsView):
 
     def scripts(self):
-        if not TURNED_ON:
+        util = zope.component.queryUtility(IAssetsConfig)
+        if not getattr(util, 'active', False):
             return super(ScriptsView, self).scripts()
         env = zope.component.getUtility(IWebAssetsEnvironment)
         context = aq_inner(self.context)
@@ -65,7 +65,8 @@ class ScriptsView(BaseScriptsView):
 class StylesView(BaseStylesView):
 
     def styles(self):
-        if not TURNED_ON:
+        util = zope.component.queryUtility(IAssetsConfig)
+        if not getattr(util, 'active', False):
             return super(StylesView, self).styles()
         env = zope.component.getUtility(IWebAssetsEnvironment)
         context = aq_inner(self.context)

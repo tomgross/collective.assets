@@ -7,6 +7,7 @@
     i18n_domain="collective.assets">
 
   <five:registerPackage package="." />
+  <includeOverrides package="." />
 
   <browser:page
       name="generate-assets"
