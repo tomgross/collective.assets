@@ -3,9 +3,11 @@ from zope.schema import Bool
 
 from collective.assets import CollectiveAssetsMessageFactory as _
 
+class IWebAssetsEnvironment(Interface):
+    """ Allow webassets environment to be an utility """
+
 class IAssetsConfig(Interface):
     """ """
-
 
 class IAssetsSchema(Interface):
     """ """

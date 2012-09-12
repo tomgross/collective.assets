@@ -1,10 +1,12 @@
 import unittest2 as unittest
 
+import zope.component
 from Products.CMFCore.utils import getToolByName
 
 from collective.assets.testing import\
     COLLECTIVE_ASSETS_INTEGRATION_TESTING
 
+from collective.assets.interfaces import IWebAssetsEnvironment
 
 class TestProduct(unittest.TestCase):
 
@@ -23,3 +25,7 @@ class TestProduct(unittest.TestCase):
         installed = [p['id'] for p in self.qi_tool.listInstalledProducts()]
         self.assertTrue(pid in installed,
                         'package appears not to have been installed')
+
+    def test_environment(self):
+        env = zope.component.getUtility(IWebAssetsEnvironment)
+        print env()

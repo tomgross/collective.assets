@@ -13,8 +13,7 @@ import zope.component
 
 from webassets import Bundle, Environment
 from jsmin import jsmin
-from .env import IWebAssetsEnvironment
-from .interfaces import IAssetsConfig
+from .interfaces import IAssetsConfig, IWebAssetsEnvironment
 
 LOG = logging.getLogger('assets')
 
