@@ -25,13 +25,11 @@ except ImportError:
     HAS_RR = False
     BaseScriptsView = BaseStylesView = BrowserView
 
-def is_anonymous():
-    user = getSecurityManager().getUser()
-    return bool(user.getUserName() == 'Anonymous User')
 
 def check(bundle, context):
     if bundle.extra_data.get('authenticated', False):
-        return not is_anonymous()
+        portal_state = context.restrictedTraverse('@@plone_portal_state')
+        return not portal_state.anonymous()
     exp = bundle.extra_data.get('expression', False)
     if not exp:
         return True
