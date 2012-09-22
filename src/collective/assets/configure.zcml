@@ -24,8 +24,8 @@
       />
 
   <utility
-      factory=".env.get_webassets_environment"
-      provides=".env.IWebAssetsEnvironment"
+      factory=".env.PloneEnvironment"
+      provides=".interfaces.IWebAssetsEnvironment"
       />
 
   <gs:registerProfile
