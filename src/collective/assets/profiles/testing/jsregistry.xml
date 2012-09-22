@@ -4,6 +4,6 @@
  <javascript id="fullcompressed.js" compression="full" />
  <javascript id="authenticated.js" authenticated="True" />
  <javascript id="notcompressed.js" compression="none" authenticated="True" />
- <stylesheet id="withexpression.css"
+ <stylesheet id="withexpression.js"
              expression="python:portal.restrictedTraverse('@@plone_portal_state').is_rtl()" />
 </object>
