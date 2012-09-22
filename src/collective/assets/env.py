@@ -18,3 +18,7 @@ class PloneEnvironment(Environment):
         resource_path = join(plone_resource.directory, 'theme', 'rr')
         super(PloneEnvironment, self).__init__(resource_path, '/++theme++rr')
 
+    def clear(self):
+        self._named_bundles = {}
+        self._anon_bundles = []
+
