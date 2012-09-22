@@ -1,0 +1,6 @@
+/* This CSS is reserved for print media */
+
+div.noprint {
+   display: none;
+
+}

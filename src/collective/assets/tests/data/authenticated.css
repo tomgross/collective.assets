@@ -1,0 +1,6 @@
+/* This CSS is only used if the user is authenticated */
+
+div.auth {
+   color: red;
+
+}
