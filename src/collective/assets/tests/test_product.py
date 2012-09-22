@@ -1,7 +1,13 @@
+import os.path
 import unittest2 as unittest
 
 import zope.component
 from Products.CMFCore.utils import getToolByName
+  
+from plone.app.testing import TEST_USER_ID
+from plone.app.testing import TEST_USER_NAME
+from plone.app.testing import login
+from plone.app.testing import setRoles
 
 from collective.assets.testing import\
     COLLECTIVE_ASSETS_INTEGRATION_TESTING
@@ -36,6 +42,7 @@ class TestProduct(unittest.TestCase):
 class TestHelperMethods(unittest.TestCase):
 
     layer = COLLECTIVE_ASSETS_INTEGRATION_TESTING
+    data_attrs = ('oid', 'filters', 'suffix')
 
     def setUp(self):
         self.portal = self.layer['portal']
@@ -46,12 +53,12 @@ class TestHelperMethods(unittest.TestCase):
 
     def test_js_data(self):
         from collective.assets.browser import JS
-        for attr in ('oid', 'filters', 'suffix'):
+        for attr in self.data_attrs:
             self.assertTrue(hasattr(JS, attr))
 
     def test_css_data(self):
         from collective.assets.browser import CSS
-        for attr in ('oid', 'filters', 'suffix'):
+        for attr in self.data_attrs:
             self.assertTrue(hasattr(CSS, attr))
 
 class TestViews(unittest.TestCase):
@@ -62,10 +69,23 @@ class TestViews(unittest.TestCase):
         self.portal = self.layer['portal']
         self.request = self.layer['request']
         self._set_active(False)
+        self._add_dummy_resources()
 
     def _set_active(self, active):
         util = zope.component.queryUtility(IAssetsConfig)
         util.active = active
+
+    def _add_dummy_resources(self):
+        datadir = os.path.join(os.path.dirname(__file__), 'data')
+        for css in ['authenticated.css',
+                    'printmedia.css',
+                    'withexpression.css']:
+            setRoles(self.portal, TEST_USER_ID, ['Manager'])
+            login(self.portal, TEST_USER_NAME)
+            self.portal.invokeFactory('File', id=css)
+            setRoles(self.portal, TEST_USER_ID, ['Member'])
+            with open(os.path.join(datadir, css)) as f:
+                self.portal[css].setFile(f.read())
 
     def test_scripts_view(self):
         from collective.assets.browser import ScriptsView
@@ -87,3 +107,7 @@ class TestViews(unittest.TestCase):
         styles = stylesview.styles()
         # No bundles registered
         self.assertEqual(styles, [])
+
+    def test_generate(self):
+        print [x.getId() for x in self.portal.portal_css.resources]
+        pass

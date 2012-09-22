@@ -21,7 +21,7 @@ try:
     from Products.ResourceRegistries.browser.scripts import ScriptsView as BaseScriptsView
     from Products.ResourceRegistries.browser.styles import StylesView as BaseStylesView
     HAS_RR = True
-except ImportError:
+except ImportError:     # pragma: no cover
     HAS_RR = False
     BaseScriptsView = BaseStylesView = BrowserView
 

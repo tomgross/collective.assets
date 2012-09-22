@@ -20,8 +20,8 @@ class CollectiveAssets(PloneSandboxLayer):
         # Load ZCML for this package
         import collective.assets
         resources_dir = mkdtemp()
-        gsm = getGlobalSiteManager()
         directory = FilesystemResourceDirectory(resources_dir, u'')
+        gsm = getGlobalSiteManager()
         gsm.registerUtility(directory,
                             IResourceDirectory,
                             name=u'')
@@ -32,6 +32,7 @@ class CollectiveAssets(PloneSandboxLayer):
 
     def setUpPloneSite(self, portal):
         applyProfile(portal, 'plone.resource:default')
+        applyProfile(portal, 'collective.assets:testing')
         applyProfile(portal, 'collective.assets:default')
 
 COLLECTIVE_ASSETS_FIXTURE = CollectiveAssets()

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<object name="portal_javascripts" meta_type="JavaScripts Registry" remove="True">
+ <javascript id="notenabled.js" enabled="False" />
+ <javascript id="fullcompressed.js" compression="full" />
+ <javascript id="authenticated.js" authenticated="True" />
+ <javascript id="notcompressed.js" compression="none" authenticated="True" />
+ <stylesheet id="withexpression.css"
+             expression="python:portal.restrictedTraverse('@@plone_portal_state').is_rtl()" />
+</object>

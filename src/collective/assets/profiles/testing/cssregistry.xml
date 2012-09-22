@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<object name="portal_css" meta_type="Stylesheets Registry" purge="True">
+ <stylesheet id="authenticated.css" authenticated="True" />
+ <stylesheet id="printmedia.css" media="print" />
+ <stylesheet id="withexpression.css"
+             expression="python:portal.restrictedTraverse('@@plone_portal_state').is_rtl()" />
+</object>

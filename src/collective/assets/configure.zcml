@@ -37,6 +37,15 @@
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
 
+  <gs:registerProfile
+      name="testing"
+      title="collective.assets-testing"
+      directory="profiles/testing"
+      description="Testing profile for web assets for Plone"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      provides="Products.GenericSetup.interfaces.BASE"
+      />
+
   <adapter factory=".configlet.AssetsControlPanelAdapter" />
 
 </configure>
