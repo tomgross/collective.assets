@@ -87,6 +87,9 @@ class TestViews(unittest.TestCase):
         util = zope.component.queryUtility(IAssetsConfig)
         util.active = active
 
+    def _generate_assets(self):
+        return GenerateAssetsView(self.portal, self.request)()
+
     def _add_dummy_resources(self):
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
         login(self.portal, TEST_USER_NAME)
@@ -110,6 +113,13 @@ class TestViews(unittest.TestCase):
         scripts = scriptsview.scripts()
         # No bundles registered
         self.assertEqual(scripts, [])
+        self._generate_assets()
+        scripts = scriptsview.scripts()
+        self.assertEqual(scripts,
+            [{'inline': False, 'conditionalcomment': '',
+              'src': '/++theme++rr/gen/packed0.js?d41d8cd9'},
+             {'inline': False, 'conditionalcomment': '',
+              'src': '/++theme++rr/gen/packed1.js?d41d8cd9'}])
 
     def test_styles_view(self):
         from collective.assets.browser import StylesView
@@ -120,10 +130,12 @@ class TestViews(unittest.TestCase):
         styles = stylesview.styles()
         # No bundles registered
         self.assertEqual(styles, [])
+        self._generate_assets()
+        styles = stylesview.styles()
+        print styles
 
     def test_generate(self):
         self.assertEqual(len(self.env), 0)
-        generate = GenerateAssetsView(self.portal, self.request)
-        self.assertIn('Done', generate())
+        self.assertIn('Done', self._generate_assets())
         self.assertEqual(len(self.env), 5)
 

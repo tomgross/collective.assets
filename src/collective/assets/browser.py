@@ -10,6 +10,7 @@ from Products.Five import BrowserView
 from Products.CMFCore.utils import getToolByName
 
 import zope.component
+from zope.component.hooks import getSite
 
 from webassets import Bundle, Environment
 from jsmin import jsmin
@@ -47,6 +48,7 @@ class ScriptsView(BaseScriptsView):
             return super(ScriptsView, self).scripts()
         env = zope.component.getUtility(IWebAssetsEnvironment)
         context = aq_inner(self.context)
+        site_url = getSite().absolute_url()
         scripts = []
         for name, bundle in env._named_bundles.iteritems():
             if not name.startswith('js-'):
@@ -55,7 +57,7 @@ class ScriptsView(BaseScriptsView):
                 continue
             scripts.append({'inline': False,
                             'conditionalcomment' : '',
-                            'src': bundle.urls()[0]})
+                            'src': site_url + bundle.urls()[0]})
         scripts.sort(key=operator.itemgetter('src'))
         return scripts
 
@@ -68,10 +70,8 @@ class StylesView(BaseStylesView):
         env = zope.component.getUtility(IWebAssetsEnvironment)
         context = aq_inner(self.context)
 
+        site_url = getSite().absolute_url()
         styles = []        
-
-        site_url = 'http://localhost:8080/Plone'
-
         for name, bundle in env._named_bundles.iteritems():
             if not name.startswith('css-'):
                 continue
