@@ -47,5 +47,6 @@
       />
 
   <adapter factory=".configlet.AssetsControlPanelAdapter" />
+  <adapter factory=".configlet.AssetsOverviewAdapter" />
 
 </configure>

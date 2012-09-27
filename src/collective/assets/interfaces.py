@@ -1,5 +1,5 @@
 from zope.interface import Interface
-from zope.schema import Bool
+from zope.schema import Bool, Text
 
 from collective.assets import CollectiveAssetsMessageFactory as _
 
@@ -18,3 +18,16 @@ class IAssetsSchema(Interface):
                   default=False)
 
 
+class IAssetsOverview(Interface):
+
+    css = Text(title=_('assets_css_label', default=u'CSS Resources'),
+                  description=_('assets_css_help',
+                      default=u'CSS resources registered as webassets'),
+                  default=u'',
+                  readonly=True)
+
+    js = Text(title=_('assets_js_label', default=u'JavaScript Resources'),
+                  description=_('assets_js_help',
+                      default=u'JavaScript resources registered as webassets'),
+                  default=u'',
+                  readonly=True)
