@@ -8,11 +8,13 @@ from AccessControl import getSecurityManager
 
 from Products.Five import BrowserView
 from Products.CMFCore.utils import getToolByName
+from Products.statusmessages.interfaces import IStatusMessage
 
 import zope.component
 from zope.component.hooks import getSite
 
 from webassets import Bundle, Environment
+from webassets.env import RegisterError
 from jsmin import jsmin
 from .interfaces import IAssetsConfig, IWebAssetsEnvironment
 
@@ -106,24 +108,21 @@ JS = PortalJavaScripts()
 
 now = lambda: datetime.datetime.now()
 
-    
+
 class GenerateAssetsView(BrowserView):
 
-    def __call__(self):
-        start = now()
+    def __call__(self, force='true'):
         context = aq_inner(self.context)
-
         env = zope.component.getUtility(IWebAssetsEnvironment)
+        if force == 'true':
+            env.clear()
 
+        start = now()
         # export portal tool content to filesystem and register as assets
         for info in [CSS, JS]:
             tool = getToolByName(context, info.oid)
-
-# XXX allow other themes
-            theme = 'Plone Default'
-
-            #saved_debug_mode = tool.getDebugMode()
             tool.setDebugMode(False)
+            theme = tool.getCurrentSkinName()
             resources = tool.getResourcesDict()
             for i, entry in enumerate(tool.getCookedResources(theme)):
 
@@ -134,7 +133,8 @@ class GenerateAssetsView(BrowserView):
                 subentries = sheets.get(entry.getId())
                 bundle_sheets = []
 
-                # get individual resources of a group
+                # get individual resources of a group and write them
+                # to the file system 
                 for eid in subentries:
                     LOG.debug('merging %s', eid)
                     file_resource = join(env.directory, info.suffix, eid)
@@ -155,15 +155,9 @@ class GenerateAssetsView(BrowserView):
             
                     f.write(content.encode('utf-8'))
                     f.close()
-                    # XXX check for caching and merging allowed
                     bundle_sheets.append('%s/%s' % (info.suffix, eid))
 
                 # generate asset and register with bundle
-#                if False:
-#                    bundle = Bundle(*bundle_sheets,
-#                                    output='gen/%s-%s' %  (i, entry.getId()))
-#                elif entry.getCompression() == 'none' or \
-#                    (info.suffix == 'js' and entry.getCompression() == 'safe'):
                 if entry.getCompression() == 'none':
                     bundle = Bundle(*bundle_sheets,
                                     output='gen/packed%s.%s' %  (i, info.suffix))
@@ -176,7 +170,13 @@ class GenerateAssetsView(BrowserView):
                 if info.suffix == 'css':
                     bundle.extra_data['media'] = entry.getMedia()
                     bundle.extra_data['rendering'] = entry.getRendering()
-                env.register('%s-%s' % (info.suffix, i), bundle)
-            #tool.setDebugMode(saved_debug_mode)
-        return "Done!\nTook: %s " % (now() - start)
+                try:
+                    env.register('%s-%s' % (info.suffix, i), bundle)
+                except RegisterError:
+                    return ("Failed!\nBundle %s-%s already registered. "
+                            "Try force mode to recreate environment.") % (
+                            info.suffix, i)
+        msg = "Done!\nTook: %s " % (now() - start)
+        IStatusMessage(self.request).add(msg)
+        return msg
 
