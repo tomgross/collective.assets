@@ -46,7 +46,7 @@
       provides="Products.GenericSetup.interfaces.BASE"
       />
 
-  <adapter factory=".configlet.AssetsControlPanelAdapter" />
-  <adapter factory=".configlet.AssetsOverviewAdapter" />
+  <adapter factory=".configlet.AssetsCPConfigAdapter" />
+  <adapter factory=".configlet.AssetsCPOverviewAdapter" />
 
 </configure>

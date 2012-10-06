@@ -4,74 +4,70 @@ from zope.interface import Interface, implements
 from zope.schema import Bool
 from persistent import Persistent
 
-from Products.CMFDefault.formlib.schema import SchemaAdapterBase
 from Products.CMFPlone.interfaces import IPloneSiteRoot
 from plone.app.controlpanel.form import ControlPanelForm
+from plone.app.form.validators import null_validator
 
 from plone.fieldsets.fieldsets import FormFieldsets
 from zope.formlib.form import action
 
 from collective.assets import CollectiveAssetsMessageFactory as _
-from .interfaces import IAssetsSchema, IAssetsConfig, IAssetsOverview, IWebAssetsEnvironment
+from .interfaces import IAssetsCPConfigSchema, IAssetsCPOverviewSchema, IWebAssetsEnvironment
 
 
-class AssetsConfig(Persistent):
-
-    implements(IAssetsConfig)
-
-    def __init__(self):
-        self.active = False
-
-
-class AssetsControlPanelAdapter(SchemaAdapterBase):
+class AssetsCPConfigAdapter(object):
     zope.component.adapts(IPloneSiteRoot)
-    implements(IAssetsSchema)
+    implements(IAssetsCPConfigSchema)
 
-    def getActive(self):
-        util = zope.component.queryUtility(IAssetsConfig)
-        return getattr(util, 'active', '')
+    def __init__(self, context):
+        self.context = context
 
-    def setActive(self, value):
-        util = zope.component.queryUtility(IAssetsConfig)
-        if util is not None:
-            util.active = value
+    def __getattr__(self, name):
+        env = zope.component.getUtility(IWebAssetsEnvironment)
+        if name in env.config:
+            return env.config[name]
+        return super(AssetsCPConfigAdapter, self).__getattr__(name)
 
-    active = property(getActive, setActive)
+    def __setattr__(self, name, value):
+        env = zope.component.getUtility(IWebAssetsEnvironment)
+        if name in env.config:
+            env.config[name] = value
+        else:
+            object.__setattr__(self, name, value)
 
-
-class AssetsOverviewAdapter(SchemaAdapterBase):
+class AssetsCPOverviewAdapter(object):
     zope.component.adapts(IPloneSiteRoot)
-    implements(IAssetsOverview)
+    implements(IAssetsCPOverviewSchema)
+
+    def __init__(self, context):
+        self.context = context
+        self.env = zope.component.getUtility(IWebAssetsEnvironment)
 
     @property
     def css(self):
-        env = zope.component.getUtility(IWebAssetsEnvironment)
         styles = []        
-        for name, bundle in env._named_bundles.iteritems():
+        for name, bundle in self.env._named_bundles.iteritems():
             if not name.startswith('css-'):
                 continue
             styles.append('%s [%s]' % (bundle.urls()[0],
                                        bundle.extra_data.get('media', None)))
-        styles.sort()
-        return '\r\n'.join(styles)
+        return sorted(styles)
 
     @property
     def js(self):
-        env = zope.component.getUtility(IWebAssetsEnvironment)
         scripts = []        
-        for name, bundle in env._named_bundles.iteritems():
+        for name, bundle in self.env._named_bundles.iteritems():
             if not name.startswith('js-'):
                 continue
             scripts.append('%s' % (bundle.urls()[0]))
-        scripts.sort()
-        return '\r\n'.join(scripts)
+        return sorted(scripts)
 
 
-assetsschema = FormFieldsets(IAssetsSchema)
+assetsschema = FormFieldsets(IAssetsCPConfigSchema)
 assetsschema.id = 'assetsconfig'
 assetsschema.label = _(u'label_assetsconfig', default=u'Configuration')
 
-assetsoverview = FormFieldsets(IAssetsOverview)
+assetsoverview = FormFieldsets(IAssetsCPOverviewSchema)
 assetsoverview.id = 'assetsoverview'
 assetsoverview.label = _(u'label_assetsoverview', default=u'Overview')
 
@@ -82,12 +78,14 @@ class AssetsControlPanel(ControlPanelForm):
 
     label = _('label_assets_settings', default='Assets settings')
     description = _('help_assets_settings',
-                     default='Settings to enable and configure web assets.')
+                    default='Settings to enable and configure web assets.')
     form_name = _('label_assets_settings', default='Assets settings')
+
+    actions = ControlPanelForm.actions.copy()
 
     @action(_(u'label_generate', default=u'Generate Assets'),
             name=u'generate')
     def handle_generate_action(self, action, data):
         generateview = zope.component.queryMultiAdapter(
                 (self.context, self.request), name="generate-assets")
-        return generateview()
+        generateview()

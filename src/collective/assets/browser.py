@@ -16,7 +16,7 @@ from zope.component.hooks import getSite
 from webassets import Bundle, Environment
 from webassets.env import RegisterError
 from jsmin import jsmin
-from .interfaces import IAssetsConfig, IWebAssetsEnvironment
+from .interfaces import IWebAssetsEnvironment
 
 LOG = logging.getLogger('assets')
 
@@ -45,10 +45,9 @@ def check(bundle, context):
 class ScriptsView(BaseScriptsView):
 
     def scripts(self):
-        util = zope.component.queryUtility(IAssetsConfig)
-        if not getattr(util, 'active', False):
-            return super(ScriptsView, self).scripts()
         env = zope.component.getUtility(IWebAssetsEnvironment)
+        if not env.config.get('active', False):
+            return super(ScriptsView, self).scripts()
         context = aq_inner(self.context)
         site_url = getSite().absolute_url()
         scripts = []
@@ -66,10 +65,9 @@ class ScriptsView(BaseScriptsView):
 class StylesView(BaseStylesView):
 
     def styles(self):
-        util = zope.component.queryUtility(IAssetsConfig)
-        if not getattr(util, 'active', False):
-            return super(StylesView, self).styles()
         env = zope.component.getUtility(IWebAssetsEnvironment)
+        if not env.config.get('active', False):
+            return super(StylesView, self).styles()
         context = aq_inner(self.context)
 
         site_url = getSite().absolute_url()
@@ -149,9 +147,6 @@ class GenerateAssetsView(BrowserView):
                         m = resource.getMedia()
                         if m:
                             content = '@media %s {\n%s\n}\n' % (m, content)
-                    elif info.suffix == 'js':
-                        if resource.getCompression() != 'none':
-                            content = jsmin(content)
             
                     f.write(content.encode('utf-8'))
                     f.close()
