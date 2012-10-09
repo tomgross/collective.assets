@@ -49,8 +49,9 @@ class AssetsCPOverviewAdapter(object):
         for name, bundle in self.env._named_bundles.iteritems():
             if not name.startswith('css-'):
                 continue
-            styles.append('%s [%s]' % (bundle.urls()[0],
-                                       bundle.extra_data.get('media', None)))
+            for url in bundle.urls():
+                styles.append('%s [%s]' % (
+                    url, bundle.extra_data.get('media', None)))
         return sorted(styles)
 
     @property
@@ -59,7 +60,7 @@ class AssetsCPOverviewAdapter(object):
         for name, bundle in self.env._named_bundles.iteritems():
             if not name.startswith('js-'):
                 continue
-            scripts.append('%s' % (bundle.urls()[0]))
+            scripts.extend(bundle.urls())
         return sorted(scripts)
 
 

@@ -56,9 +56,10 @@ class ScriptsView(BaseScriptsView):
                 continue
             if not check(bundle, context):
                 continue
-            scripts.append({'inline': False,
-                            'conditionalcomment' : '',
-                            'src': site_url + bundle.urls()[0]})
+            for url in bundle.urls():
+                scripts.append({'inline': False,
+                                'conditionalcomment' : '',
+                                'src': site_url + url})
         scripts.sort(key=operator.itemgetter('src'))
         return scripts
 
@@ -77,13 +78,14 @@ class StylesView(BaseStylesView):
                 continue
             if not check(bundle, context):
                 continue
-            styles.append({'rendering': 'link',
-                        'media': bundle.extra_data.get('media', None),
-                        'rel': 'stylesheet',
-                        'rendering': bundle.extra_data.get('rendering', 'link'),
-                        'title': None,
-                        'conditionalcomment' : '',
-                        'src': site_url + bundle.urls()[0]})
+            for url in bundle.urls():
+                styles.append({'rendering': 'link',
+                    'media': bundle.extra_data.get('media', 'screen'),
+                    'rel': 'stylesheet',
+                    'rendering': bundle.extra_data.get('rendering', 'link'),
+                    'title': None,
+                    'conditionalcomment' : '',
+                    'src': site_url + url})
         styles.sort(key=operator.itemgetter('src'))
         return styles
 
@@ -134,6 +136,10 @@ class GenerateAssetsView(BrowserView):
                 # get individual resources of a group and write them
                 # to the file system 
                 for eid in subentries:
+                    resource = resources[eid]
+                    if resource.getConditionalcomment():
+                        LOG.debug('skipping %s', eid)
+                        continue
                     LOG.debug('merging %s', eid)
                     file_resource = join(env.directory, info.suffix, eid)
                     if not exists(dirname(file_resource)):
@@ -142,7 +148,6 @@ class GenerateAssetsView(BrowserView):
                     content = tool.getResourceContent(
                                 eid, context, original=True, theme=theme)
 
-                    resource = resources[eid]
                     if info.suffix == 'css':
                         m = resource.getMedia()
                         if m:
@@ -151,6 +156,8 @@ class GenerateAssetsView(BrowserView):
                     f.write(content.encode('utf-8'))
                     f.close()
                     bundle_sheets.append('%s/%s' % (info.suffix, eid))
+                if not bundle_sheets:
+                    continue
 
                 # generate asset and register with bundle
                 if entry.getCompression() == 'none':
