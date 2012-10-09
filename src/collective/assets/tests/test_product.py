@@ -12,7 +12,7 @@ from plone.app.testing import setRoles
 from collective.assets.testing import\
     COLLECTIVE_ASSETS_INTEGRATION_TESTING
 
-from collective.assets.interfaces import IWebAssetsEnvironment, IAssetsConfig
+from collective.assets.interfaces import IWebAssetsEnvironment
 from collective.assets.browser import check, GenerateAssetsView
 from webassets import Environment
 from webassets.bundle import Bundle
@@ -76,16 +76,15 @@ class TestViews(unittest.TestCase):
     def setUp(self):
         self.portal = self.layer['portal']
         self.request = self.layer['request']
+        self.env = zope.component.getUtility(IWebAssetsEnvironment)
         self._set_active(False)
         self._add_dummy_resources()
-        self.env = zope.component.getUtility(IWebAssetsEnvironment)
 
     def tearDown(self):
         self.env.clear()
 
     def _set_active(self, active):
-        util = zope.component.queryUtility(IAssetsConfig)
-        util.active = active
+        self.env.config['active'] = active
 
     def _generate_assets(self):
         return GenerateAssetsView(self.portal, self.request)()
@@ -103,6 +102,8 @@ class TestViews(unittest.TestCase):
                 self.portal[resource].setFile(f.read())
         setRoles(self.portal, TEST_USER_ID, ['Member'])
 
+    prefix = 'http://nohost/plone/++theme++rr'
+
     def test_scripts_view(self):
         from collective.assets.browser import ScriptsView
         scriptsview = ScriptsView(self.portal, self.request)
@@ -117,22 +118,29 @@ class TestViews(unittest.TestCase):
         scripts = scriptsview.scripts()
         self.assertEqual(scripts,
             [{'inline': False, 'conditionalcomment': '',
-              'src': '/++theme++rr/gen/packed0.js?d41d8cd9'},
+              'src': self.prefix + '/gen/packed0.js?d41d8cd9'},
              {'inline': False, 'conditionalcomment': '',
-              'src': '/++theme++rr/gen/packed1.js?d41d8cd9'}])
+              'src': self.prefix + '/gen/packed1.js?d41d8cd9'}])
 
     def test_styles_view(self):
         from collective.assets.browser import StylesView
         stylesview = StylesView(self.portal, self.request)
         styles = stylesview.styles()
-        self.assertTrue(styles[0]['src'].startswith('http://nohost/plone/portal_css/'))
+        self.assertTrue(styles[0]['src'].startswith(
+            'http://nohost/plone/portal_css/'))
         self._set_active(True)
         styles = stylesview.styles()
         # No bundles registered
         self.assertEqual(styles, [])
         self._generate_assets()
         styles = stylesview.styles()
-        print styles
+        self.assertEqual(styles,
+            [{'src': self.prefix + '/gen/packed0.css?43d3ad54',
+              'title': None, 'media': 'screen', 'rendering': 'link',
+              'conditionalcomment': '', 'rel': 'stylesheet'},
+             {'src': self.prefix + '/gen/packed1.css?10635274',
+              'title': None, 'media': 'print', 'rendering': 'link',
+              'conditionalcomment': '', 'rel': 'stylesheet'}])
 
     def test_generate(self):
         self.assertEqual(len(self.env), 0)
