@@ -8,8 +8,12 @@ Why webassets?
 
 Webassets are a standardized way of proving web resources. They can be easily
 dispatched through commen webservers and support minification, filter-plugins
- (like LESS, CoffeeScript, etc.) and yaml based configuration.
-Collective.assets provides a thin layer above the webassets-library [1].
+ (like LESS, CoffeeScript, etc.) and YAML based configuration.
+Collective.assets provides the glue betweeen the webassets_-library and
+plone.resource. Plone.resource was choosen (instead of just dumping the
+resources to the filesystem) because then it is possible to access the files
+via ZServer too, which is handy for development where don't have an external
+webserver running.
 
 Usage
 -----
@@ -37,3 +41,5 @@ Known issues
   to change the compression-level from *safe* to *none*.
 - The product does not support all features of the resource registry
   (some of them out of intention eg. inline resources, conditial comments)
+
+.. _webassets: http://pypi.python.org/pypi/webassets
