@@ -13,7 +13,7 @@ from Products.statusmessages.interfaces import IStatusMessage
 import zope.component
 from zope.component.hooks import getSite
 
-from webassets import Bundle, Environment
+from webassets import Bundle
 from webassets.env import RegisterError
 from jsmin import jsmin
 from .interfaces import IWebAssetsEnvironment
