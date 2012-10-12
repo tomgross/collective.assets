@@ -1,6 +1,8 @@
 collective.assets - Webassets for Plone
 =======================================
 
+"!https://travis-ci.org/tomgross/collective.assets.png!":https://travis-ci.org/tomgross/collective.assets
+
 .. contents::
 
 Why webassets?
