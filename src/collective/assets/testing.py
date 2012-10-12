@@ -17,6 +17,10 @@ class CollectiveAssets(PloneSandboxLayer):
     defaultBases = (PLONE_FIXTURE, )
 
     def setUpZope(self, app, configurationContext):
+        import plone.resource
+        xmlconfig.file('configure.zcml',
+                       plone.resource,
+                       context=configurationContext)
         # Load ZCML for this package
         import collective.assets
         resources_dir = mkdtemp()
@@ -28,7 +32,6 @@ class CollectiveAssets(PloneSandboxLayer):
         xmlconfig.file('configure.zcml',
                        collective.assets,
                        context=configurationContext)
-
 
     def setUpPloneSite(self, portal):
         applyProfile(portal, 'plone.resource:default')
