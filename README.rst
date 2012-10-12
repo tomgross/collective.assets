@@ -1,7 +1,7 @@
 collective.assets - Webassets for Plone
 =======================================
 
-"!https://travis-ci.org/tomgross/collective.assets.png!":https://travis-ci.org/tomgross/collective.assets
+travisbuildstatus_
 
 .. contents::
 
@@ -45,3 +45,4 @@ Known issues
   (some of them out of intention eg. inline resources, conditial comments)
 
 .. _webassets: http://pypi.python.org/pypi/webassets
+.. _travisbuildstatus: https://travis-ci.org/tomgross/collective.assets.png
